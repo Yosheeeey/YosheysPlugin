@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="YosheysPlugin:jar">
+    <output-path>$PROJECT_DIR$/../../../../McServerYoshey/plugins</output-path>
+    <root id="archive" name="YosheysPlugin.jar">
+      <element id="module-output" name="YosheysPlugin" />
+    </root>
+  </artifact>
+</component>

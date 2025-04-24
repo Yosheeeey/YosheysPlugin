@@ -1,0 +1,10 @@
+name: YosheysPlugin
+version: 1.0
+main: com.yoshey.YosheysPlugin
+commands:
+  timer:
+    description: Steuert den Timer (start, pause, reset)
+    usage: /timer <start|pause|reset>
+  challenge:
+    description: Steuerung der Challenge (start, resume, pause, end)
+    usage: /challenge <start|resume|pause|stop>
