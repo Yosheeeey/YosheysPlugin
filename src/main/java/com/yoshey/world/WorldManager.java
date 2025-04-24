@@ -33,18 +33,26 @@ public class WorldManager {
         nether.environment(World.Environment.NETHER);
         Bukkit.createWorld(nether);
 
+        // Endwelt erstellen
         WorldCreator theEndCreator = new WorldCreator(name + "_the_end");
         theEndCreator.environment(World.Environment.THE_END);
         World theEnd = Bukkit.createWorld(theEndCreator);
 
-        Location center = new Location(theEnd, 0, 60, 0);
+        int px = 100;
+        int py = 49; // Plattformhöhe wie Vanilla
+        int pz = 0;
+        Location center = new Location(theEnd, px, py, pz);
+
         for (int x = -2; x <= 2; x++) {
             for (int z = -2; z <= 2; z++) {
                 theEnd.getBlockAt(center.clone().add(x, 0, z)).setType(Material.OBSIDIAN);
+                for (int y = 1; y <= 3; y++) {
+                    theEnd.getBlockAt(center.clone().add(x, y, z)).setType(Material.AIR);
+                }
             }
         }
-        theEnd.getBlockAt(0, 61, 0).setType(Material.BEDROCK);
 
+        theEnd.setSpawnLocation(new Location(theEnd, px, py + 1, pz));
 
         Bukkit.getLogger().info("[WorldManager] Welt '" + name + "' mit Nether & End wurde erstellt.");
 
