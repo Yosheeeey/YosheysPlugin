@@ -43,12 +43,12 @@ public class WorldManager {
                 theEnd.getBlockAt(center.clone().add(x, 0, z)).setType(Material.OBSIDIAN);
             }
         }
-        theEnd.setSpawnLocation(center);
+        theEnd.getBlockAt(0, 61, 0).setType(Material.BEDROCK);
 
 
         Bukkit.getLogger().info("[WorldManager] Welt '" + name + "' mit Nether & End wurde erstellt.");
 
-        return world; // ← Hier kommt der wichtige Fix!
+        return world;
     }
 
 
