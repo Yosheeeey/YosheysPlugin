@@ -1,11 +1,13 @@
 package com.yoshey;
 
+import com.yoshey.listeners.InventoryListener;
+import com.yoshey.listeners.DragonKillListener;
 import com.yoshey.listeners.LobbyProtectionListener;
+import com.yoshey.listeners.PortalListener;
 import com.yoshey.world.WorldManager;
 import com.yoshey.commands.ChallengeCommand;
 import com.yoshey.commands.TimerCommand;
 import com.yoshey.inventory.InventoryManager;
-import com.yoshey.listeners.InventoryListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -16,8 +18,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class YosheysPlugin extends JavaPlugin implements Listener {
-
-    private TimerManager timerManager;
 
     @Override
     public void onEnable() {
@@ -32,6 +32,8 @@ public class YosheysPlugin extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new LobbyProtectionListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        getServer().getPluginManager().registerEvents(new DragonKillListener(this), this);
+        getServer().getPluginManager().registerEvents(new PortalListener(this), this);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class YosheysPlugin extends JavaPlugin implements Listener {
     }
 
     private WorldManager worldManager;
-
+    private TimerManager timerManager;
     private InventoryManager inventoryManager;
 
     public WorldManager getWorldManager() {

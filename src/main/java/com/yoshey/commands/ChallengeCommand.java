@@ -12,6 +12,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class ChallengeCommand implements CommandExecutor {
 
     private final YosheysPlugin plugin;
@@ -58,23 +60,27 @@ public class ChallengeCommand implements CommandExecutor {
     }
 
     private void startChallenge() {
-        // Neue Welt erstellen
-        World world = plugin.getWorldManager().createChallengeWorld();
+        // 1. Weltname generieren
+        String worldName = "challenge-" + UUID.randomUUID().toString().substring(0, 6);
 
-        // Weltname speichern
+        // 2. Welt + Nether + End erstellen und Overworld erhalten
+        World world = plugin.getWorldManager().createChallengeWorld(worldName);
+
+        // 3. Weltname speichern
         plugin.getConfig().set("active-challenge-world", world.getName());
         plugin.saveConfig();
 
-        // Alle Spieler teleportieren
+        // 4. Alle Spieler teleportieren
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(world.getSpawnLocation());
             p.setGameMode(GameMode.SURVIVAL);
         }
 
-        // Timer starten
+        // 5. Timer starten
         plugin.getTimerManager().resetTimer();
         plugin.getTimerManager().startTimer();
     }
+
 
     private void resumeChallenge(Player player) {
         String worldName = plugin.getConfig().getString("active-challenge-world");

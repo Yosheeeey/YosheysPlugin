@@ -24,15 +24,25 @@ public class WorldManager {
         }
     }
 
-    public World createChallengeWorld() {
-        String name = "challenge-" + UUID.randomUUID().toString().substring(0, 6);
+    public World createChallengeWorld(String name) {
+        WorldCreator overworld = new WorldCreator(name);
+        overworld.environment(World.Environment.NORMAL);
+        World world = Bukkit.createWorld(overworld); // ← das wird zurückgegeben
 
-        WorldCreator creator = new WorldCreator(name);
-        creator.environment(World.Environment.NORMAL);
-        creator.type(WorldType.NORMAL);
+        WorldCreator nether = new WorldCreator(name + "_nether");
+        nether.environment(World.Environment.NETHER);
+        Bukkit.createWorld(nether);
 
-        return Bukkit.createWorld(creator); // neue Welt wird automatisch geladen
+        WorldCreator theEnd = new WorldCreator(name + "_the_end");
+        theEnd.environment(World.Environment.THE_END);
+        Bukkit.createWorld(theEnd);
+
+        Bukkit.getLogger().info("[WorldManager] Welt '" + name + "' mit Nether & End wurde erstellt.");
+
+        return world; // ← Hier kommt der wichtige Fix!
     }
+
+
 
     public void deleteWorld(World world) {
         if (world == null) return;
