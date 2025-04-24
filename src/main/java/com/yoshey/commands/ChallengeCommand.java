@@ -158,23 +158,29 @@ public class ChallengeCommand implements CommandExecutor {
 
 
     private void endChallenge(Player player) {
-        String worldName = plugin.getConfig().getString("active-challenge-world");
-        if (worldName == null) {
+        String baseWorldName = plugin.getConfig().getString("active-challenge-world");
+        if (baseWorldName == null) {
             player.sendMessage("§cKeine aktive Challenge zu beenden.");
             return;
         }
 
-        World world = Bukkit.getWorld(worldName);
         plugin.getTimerManager().pauseTimer();
 
+        // Alle betroffenen Welten
+        World overworld = Bukkit.getWorld(baseWorldName);
+        World nether = Bukkit.getWorld(baseWorldName + "_nether");
+        World theEnd = Bukkit.getWorld(baseWorldName + "_the_end");
+
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.getWorld().equals(world)) {
+            World pw = p.getWorld();
+            if (pw != null && (pw.equals(overworld) || pw.equals(nether) || pw.equals(theEnd))) {
                 plugin.getWorldManager().teleportToLobby(p);
             }
         }
 
-        if (world != null) {
-            plugin.getWorldManager().deleteWorld(world);
+        // Nur die Overworld löschen (die Methode löscht rekursiv den gesamten Ordner)
+        if (overworld != null) {
+            plugin.getWorldManager().deleteWorld(overworld);
         }
 
         plugin.getConfig().set("active-challenge-world", null);

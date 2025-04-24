@@ -72,7 +72,7 @@ public class TimerManager {
         displayTask.runTaskTimer(plugin, 0L, 20L);
     }
 
-    private String formatTime(int totalSeconds) {
+    public String formatTime(int totalSeconds) {
         int hours = totalSeconds / 3600;
         int minutes = (totalSeconds % 3600) / 60;
         int seconds = totalSeconds % 60;

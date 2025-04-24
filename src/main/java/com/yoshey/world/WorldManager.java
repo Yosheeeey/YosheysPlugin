@@ -33,9 +33,18 @@ public class WorldManager {
         nether.environment(World.Environment.NETHER);
         Bukkit.createWorld(nether);
 
-        WorldCreator theEnd = new WorldCreator(name + "_the_end");
-        theEnd.environment(World.Environment.THE_END);
-        Bukkit.createWorld(theEnd);
+        WorldCreator theEndCreator = new WorldCreator(name + "_the_end");
+        theEndCreator.environment(World.Environment.THE_END);
+        World theEnd = Bukkit.createWorld(theEndCreator);
+
+        Location center = new Location(theEnd, 0, 60, 0);
+        for (int x = -2; x <= 2; x++) {
+            for (int z = -2; z <= 2; z++) {
+                theEnd.getBlockAt(center.clone().add(x, 0, z)).setType(Material.OBSIDIAN);
+            }
+        }
+        theEnd.setSpawnLocation(center);
+
 
         Bukkit.getLogger().info("[WorldManager] Welt '" + name + "' mit Nether & End wurde erstellt.");
 

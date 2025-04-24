@@ -22,22 +22,33 @@ public class DragonKillListener implements Listener {
     public void onDragonKill(EntityDeathEvent event) {
         Entity entity = event.getEntity();
 
+        Bukkit.getLogger().info("[DEBUG] Entity gestorben: " + entity.getType());
+
         if (!(entity instanceof EnderDragon)) return;
 
         World world = entity.getWorld();
         String activeWorld = plugin.getConfig().getString("active-challenge-world");
 
-        // Ist es wirklich die Challenge-Welt?
-        if (!world.getName().equals(activeWorld)) return;
+        Bukkit.getLogger().info("[DEBUG] Drachen ist gestorben in Welt: " + world.getName());
+        Bukkit.getLogger().info("[DEBUG] Gespeicherte Challenge-Welt: " + activeWorld);
+
+        // Ist es wirklich die End-Dimension der aktiven Challenge-Welt?
+        if (!world.getName().equals(activeWorld + "_the_end")) {
+            Bukkit.getLogger().info("[DEBUG] Weltname stimmt nicht überein. Kein Timer-Stopp.");
+            return;
+        }
 
         // Timer stoppen
         plugin.getTimerManager().pauseTimer();
+        Bukkit.getLogger().info("[DEBUG] Timer wurde gestoppt.");
 
-        // Info im Chat für alle Spieler in der Welt
+        // Nachricht an alle Spieler in der End-Welt
+        int seconds = plugin.getTimerManager().getSeconds();
+        String timeString = plugin.getTimerManager().formatTime(seconds);
         for (Player player : world.getPlayers()) {
-            player.sendMessage("§6§lChallenge abgeschlossen! Der Enderdrache wurde besiegt.");
+            player.sendMessage("§6§lChallenge abgeschlossen! Der Enderdrache wurde in " + timeString + " besiegt.");
         }
 
-        Bukkit.getLogger().info("[YosheysPlugin] Enderdrache in " + world.getName() + " getötet – Challenge beendet.");
+        Bukkit.getLogger().info("[YosheysPlugin] Enderdrache in " + world.getName() + " getötet – Challenge als abgeschlossen markiert.");
     }
 }

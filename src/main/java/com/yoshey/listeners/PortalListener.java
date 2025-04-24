@@ -20,42 +20,42 @@ public class PortalListener implements Listener {
     public void onPortal(PlayerPortalEvent event) {
         Player player = event.getPlayer();
         World from = event.getFrom().getWorld();
-        String baseName = from.getName();
+        String fromName = from.getName();
 
-        // Challenge-Welt erkennen (z. B. challenge-abc_nether → challenge-abc)
+        // Basis-Weltname bereinigen (z. B. challenge_xyz_the_end → challenge_xyz)
+        String baseName = fromName;
         if (baseName.endsWith("_nether")) {
             baseName = baseName.replace("_nether", "");
         } else if (baseName.endsWith("_the_end")) {
             baseName = baseName.replace("_the_end", "");
         }
 
-        Location target;
+        // Teleportlogik
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
             if (from.getEnvironment() == World.Environment.NORMAL) {
-                // Overworld → Nether
                 World nether = Bukkit.getWorld(baseName + "_nether");
                 if (nether != null) {
-                    target = nether.getSpawnLocation();
-                    event.setTo(target);
+                    event.setTo(nether.getSpawnLocation().add(0, 1, 0));
                 }
             } else if (from.getEnvironment() == World.Environment.NETHER) {
-                // Nether → Overworld
                 World overworld = Bukkit.getWorld(baseName);
                 if (overworld != null) {
-                    target = overworld.getSpawnLocation();
-                    event.setTo(target);
+                    event.setTo(overworld.getSpawnLocation().add(0, 1, 0));
                 }
             }
         }
 
         if (event.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
-            if (from.getEnvironment() == World.Environment.NORMAL) {
-                World end = Bukkit.getWorld(baseName + "_the_end");
-                if (end != null) {
-                    target = end.getSpawnLocation();
-                    event.setTo(target);
+            // Nur überschreiben, wenn der Spieler AUS dem End kommt
+            if (from.getEnvironment() == World.Environment.THE_END) {
+                World overworld = Bukkit.getWorld(baseName);
+                if (overworld != null) {
+                    Location returnLoc = overworld.getSpawnLocation().add(0, 1, 0);
+                    event.setTo(returnLoc);
+                    player.sendMessage("§7Du wurdest zurück in die Challenge-Welt teleportiert.");
                 }
             }
         }
     }
 }
+
