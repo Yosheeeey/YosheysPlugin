@@ -70,7 +70,27 @@ public class WorldManager {
         deleteFolder(folder);
     }
 
-    private void deleteFolder(File folder) {
+    public void deleteChallengeWorlds(String baseName) {
+        String[] worldVariants = {
+                baseName,
+                baseName + "_nether",
+                baseName + "_the_end"
+        };
+
+        for (String worldName : worldVariants) {
+            World world = Bukkit.getWorld(worldName);
+            if (world != null) {
+                Bukkit.unloadWorld(world, false);
+            }
+            File worldFolder = new File(Bukkit.getWorldContainer(), worldName);
+            deleteFolder(worldFolder);
+        }
+
+        Bukkit.getLogger().info("[WorldManager] Alle Welten von '" + baseName + "' wurden gelöscht.");
+    }
+
+
+    public void deleteFolder(File folder) {
         if (folder.isDirectory()) {
             for (File file : folder.listFiles()) {
                 deleteFolder(file);

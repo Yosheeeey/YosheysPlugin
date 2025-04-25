@@ -7,4 +7,4 @@ commands:
     usage: /timer <start|pause|reset>
   challenge:
     description: Steuerung der Challenge (start, resume, pause, end)
-    usage: /challenge <start|resume|pause|stop>
+    usage: /challenge <start|resume|pause|stop|cleanup|cleanup confirm>

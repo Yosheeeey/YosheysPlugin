@@ -1,5 +1,7 @@
 package com.yoshey;
 
+import com.yoshey.commands.ChallengeTabCompleter;
+import com.yoshey.commands.TimerTabCompleter;
 import com.yoshey.listeners.InventoryListener;
 import com.yoshey.listeners.DragonKillListener;
 import com.yoshey.listeners.LobbyProtectionListener;
@@ -34,6 +36,8 @@ public class YosheysPlugin extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new DragonKillListener(this), this);
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
+        getCommand("challenge").setTabCompleter(new ChallengeTabCompleter());
+        getCommand("timer").setTabCompleter(new TimerTabCompleter());
     }
 
     @Override

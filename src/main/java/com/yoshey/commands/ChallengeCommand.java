@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.io.File;
 
 public class ChallengeCommand implements CommandExecutor {
 
@@ -50,6 +51,15 @@ public class ChallengeCommand implements CommandExecutor {
 
             case "end":
                 endChallenge(player);
+                break;
+
+            case "cleanup":
+                if (args.length >= 2 && args[1].equalsIgnoreCase("confirm")) {
+                    cleanupChallenges(player);
+                } else {
+                    player.sendMessage("§cAchtung, dieser Befehl löscht ALLE Challenge-Welten");
+                    player.sendMessage("§e/challenge cleanup confirm §7zum bestätigen");
+                }
                 break;
 
             default:
@@ -178,15 +188,39 @@ public class ChallengeCommand implements CommandExecutor {
             }
         }
 
-        // Nur die Overworld löschen (die Methode löscht rekursiv den gesamten Ordner)
-        if (overworld != null) {
-            plugin.getWorldManager().deleteWorld(overworld);
-        }
+        // Jetzt alle Welten löschen
+        plugin.getWorldManager().deleteChallengeWorlds(baseWorldName);
 
         plugin.getConfig().set("active-challenge-world", null);
         plugin.getConfig().set("saved-positions", null);
         plugin.saveConfig();
 
-        player.sendMessage("§cChallenge beendet und Welt gelöscht.");
+        player.sendMessage("§cChallenge beendet und alle Welten gelöscht.");
+    }
+
+
+
+    private void cleanupChallenges(Player player) {
+        File worldFolder = Bukkit.getWorldContainer(); // Das ist normalerweise der Server-Ordner
+        int deletedWorlds = 0;
+
+        for (File file : worldFolder.listFiles()) {
+            if (file.isDirectory() && file.getName().startsWith("challenge-")) {
+                String worldName = file.getName();
+
+                // Falls die Welt noch geladen ist → zuerst entladen
+                World world = Bukkit.getWorld(worldName);
+                if (world != null) {
+                    Bukkit.unloadWorld(world, false);
+                }
+
+                // Ordner löschen
+                plugin.getWorldManager().deleteFolder(file);
+                deletedWorlds++;
+            }
+        }
+
+        player.sendMessage("§aEs wurden §e" + deletedWorlds + " §aChallenge-Welten gelöscht.");
+        plugin.getLogger().info("[WorldManager] " + deletedWorlds + " Challenge-Welten gelöscht.");
     }
 }
