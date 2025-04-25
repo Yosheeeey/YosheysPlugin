@@ -1,6 +1,5 @@
-package com.yoshey.commands;
+package com.yoshey.timer;
 
-import com.yoshey.TimerManager;
 import com.yoshey.YosheysPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

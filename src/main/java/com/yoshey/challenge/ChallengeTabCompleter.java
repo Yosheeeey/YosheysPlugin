@@ -1,4 +1,4 @@
-package com.yoshey.commands;
+package com.yoshey.challenge;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

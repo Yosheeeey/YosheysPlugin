@@ -1,6 +1,5 @@
-package com.yoshey.commands;
+package com.yoshey.challenge;
 
-import com.yoshey.TimerManager;
 import com.yoshey.YosheysPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;

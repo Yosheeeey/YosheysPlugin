@@ -1,14 +1,15 @@
 package com.yoshey;
 
-import com.yoshey.commands.ChallengeTabCompleter;
-import com.yoshey.commands.TimerTabCompleter;
+import com.yoshey.challenge.ChallengeTabCompleter;
+import com.yoshey.timer.TimerTabCompleter;
 import com.yoshey.listeners.InventoryListener;
 import com.yoshey.listeners.DragonKillListener;
 import com.yoshey.listeners.LobbyProtectionListener;
 import com.yoshey.listeners.PortalListener;
+import com.yoshey.timer.TimerManager;
 import com.yoshey.world.WorldManager;
-import com.yoshey.commands.ChallengeCommand;
-import com.yoshey.commands.TimerCommand;
+import com.yoshey.challenge.ChallengeCommand;
+import com.yoshey.timer.TimerCommand;
 import com.yoshey.inventory.InventoryManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
