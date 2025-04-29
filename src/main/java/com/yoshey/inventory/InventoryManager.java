@@ -25,54 +25,97 @@ public class InventoryManager {
         }
     }
 
+    // Speichert Inventar, Rüstung, XP, Health und Hunger
     public void saveInventory(Player player, String worldName) {
         File file = new File(dataFolder, player.getUniqueId() + ".yml");
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         PlayerInventory inv = player.getInventory();
 
+        // Inventar & Armor speichern
+        config.set(worldName + ".inventory", toBase64(inv.getContents()));
+        config.set(worldName + ".armor", toBase64(inv.getArmorContents()));
+
+        // XP speichern
+        config.set(worldName + ".xp.level", player.getLevel());
+        config.set(worldName + ".xp.total", player.getTotalExperience());
+        config.set(worldName + ".xp.progress", player.getExp());
+
+        // Health und Hunger speichern
+        config.set(worldName + ".health", player.getHealth());
+        config.set(worldName + ".food", player.getFoodLevel());
+        config.set(worldName + ".saturation", player.getSaturation());
+
         try {
-            config.set(worldName + ".inventory", toBase64(inv.getContents()));
-            config.set(worldName + ".armor", toBase64(inv.getArmorContents()));
             config.save(file);
-            Bukkit.getLogger().info("Inventar gespeichert für " + player.getName() + " in Welt " + worldName);
+            Bukkit.getLogger().info("[InventoryManager] Inventar gespeichert für " + player.getName() + " in Welt " + worldName);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    // Komfort-Variante: speichert für aktuelle Welt
     public void saveInventory(Player player) {
         String worldName = player.getWorld().getName();
         saveInventory(player, worldName);
-        Bukkit.getLogger().info("[DEBUG] Inventar gespeichert für " + player.getName() + " in " + worldName);
+        Bukkit.getLogger().info("[InventoryManager] Inventar gespeichert für " + player.getName() + " in " + worldName);
     }
 
+    // Lädt Inventar, Rüstung, XP, Health und Hunger
     public void loadInventory(Player player) {
         String world = player.getWorld().getName();
         File file = new File(dataFolder, player.getUniqueId() + ".yml");
+
         if (!file.exists()) {
-            Bukkit.getLogger().warning("[DEBUG] Keine Inventardatei gefunden für " + player.getName());
+            Bukkit.getLogger().warning("[InventoryManager] Keine Inventardatei gefunden für " + player.getName());
             return;
         }
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+
         if (!config.contains(world + ".inventory")) {
-            Bukkit.getLogger().warning("[DEBUG] Kein gespeichertes Inventar für " + player.getName() + " in Welt " + world);
+            Bukkit.getLogger().warning("[InventoryManager] Kein gespeichertes Inventar für " + player.getName() + " in Welt " + world);
             return;
         }
 
         try {
+            // Inventar und Rüstung laden
             ItemStack[] contents = fromBase64(config.getString(world + ".inventory"));
             ItemStack[] armor = fromBase64(config.getString(world + ".armor"));
 
             player.getInventory().setContents(contents);
             player.getInventory().setArmorContents(armor);
-            Bukkit.getLogger().info("[DEBUG] Inventar geladen für " + player.getName() + " in Welt " + world);
+
+            // XP laden
+            if (config.contains(world + ".xp.level")) {
+                player.setLevel(config.getInt(world + ".xp.level"));
+                player.setTotalExperience(config.getInt(world + ".xp.total"));
+                player.setExp((float) config.getDouble(world + ".xp.progress"));
+            }
+
+            // Health laden
+            if (config.contains(world + ".health")) {
+                player.setHealth(config.getDouble(world + ".health"));
+            }
+
+            // Hunger laden
+            if (config.contains(world + ".food")) {
+                player.setFoodLevel(config.getInt(world + ".food"));
+            }
+
+            // Sättigung laden
+            if (config.contains(world + ".saturation")) {
+                player.setSaturation((float) config.getDouble(world + ".saturation"));
+            }
+
+            Bukkit.getLogger().info("[InventoryManager] Inventar + Status geladen für " + player.getName() + " in Welt " + world);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // Inventar zu Base64 serialisieren
     private String toBase64(ItemStack[] items) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -85,17 +128,19 @@ public class InventoryManager {
 
             dataOutput.close();
             return Base64.getEncoder().encodeToString(outputStream.toByteArray());
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
+    // Inventar aus Base64 laden
     private ItemStack[] fromBase64(String base64) {
         if (base64 == null) {
-            Bukkit.getLogger().warning("[DEBUG] Base64-String war null – Inventar konnte nicht geladen werden.");
+            Bukkit.getLogger().warning("[InventoryManager] Base64-String war null – Inventar konnte nicht geladen werden.");
             return new ItemStack[0];
         }
+
         try {
             byte[] data = Base64.getDecoder().decode(base64);
             BukkitObjectInputStream ois = new BukkitObjectInputStream(new ByteArrayInputStream(data));
@@ -108,7 +153,7 @@ public class InventoryManager {
 
             ois.close();
             return items;
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return new ItemStack[0];
         }

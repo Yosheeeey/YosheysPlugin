@@ -15,7 +15,7 @@ public class ChallengeTabCompleter implements TabCompleter {
         if (args.length == 1) {
             return Arrays.asList("start", "resume", "pause", "end", "cleanup");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("cleanup")) {
-            return Arrays.asList("confirm");
+            return List.of("confirm");
         }
         return new ArrayList<>();
     }

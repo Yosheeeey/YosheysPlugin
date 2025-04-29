@@ -3,16 +3,16 @@ package com.yoshey.challenge;
 import com.yoshey.YosheysPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
 import java.io.File;
+import java.util.UUID;
 
 public class ChallengeCommand implements CommandExecutor {
 
@@ -24,11 +24,10 @@ public class ChallengeCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage("§cNur Spieler können diesen Befehl nutzen.");
             return true;
         }
-        Player player = (Player) sender;
 
         if (args.length == 0) {
             player.sendMessage("§eVerwende: /challenge start | resume | pause | end");
@@ -69,23 +68,36 @@ public class ChallengeCommand implements CommandExecutor {
     }
 
     private void startChallenge() {
-        // 1. Weltname generieren
         String worldName = "challenge-" + UUID.randomUUID().toString().substring(0, 6);
 
-        // 2. Welt + Nether + End erstellen und Overworld erhalten
         World world = plugin.getWorldManager().createChallengeWorld(worldName);
 
-        // 3. Weltname speichern
         plugin.getConfig().set("active-challenge-world", world.getName());
         plugin.saveConfig();
 
-        // 4. Alle Spieler teleportieren
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.teleport(world.getSpawnLocation());
             p.setGameMode(GameMode.SURVIVAL);
-        }
+            p.setInvulnerable(true);
 
-        // 5. Timer starten
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                p.getInventory().clear();
+                p.getInventory().setArmorContents(null);
+                p.setLevel(0);
+                p.setExp(0f);
+                p.setTotalExperience(0);
+                p.setHealth(p.getMaxHealth());
+                p.setFoodLevel(20);
+                p.setSaturation(5f);
+                p.getActivePotionEffects().forEach(effect -> p.removePotionEffect(effect.getType()));
+                p.setFireTicks(0);
+            });
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                p.setInvulnerable(false);
+                p.sendMessage("§7Dein Teleport-Schutz ist nun abgelaufen.");
+            }, 5 * 20L);
+        }
         plugin.getTimerManager().resetTimer();
         plugin.getTimerManager().startTimer();
     }
@@ -122,20 +134,23 @@ public class ChallengeCommand implements CommandExecutor {
                 Location loc = new Location(w, x, y, z, yaw, pitch);
                 p.teleport(loc);
                 p.setGameMode(GameMode.SURVIVAL);
+                p.getActivePotionEffects().forEach(effect -> p.removePotionEffect(effect.getType()));
+                p.setFireTicks(0);
+
 
                 plugin.getLogger().info("[DEBUG] Spieler " + p.getName() + " wurde zurück teleportiert in " + w.getName());
 
-                // Inventar der Welt laden
-                plugin.getInventoryManager().loadInventory(p);
+                Bukkit.getScheduler().runTask(plugin, () -> plugin.getInventoryManager().loadInventory(p));
             } else {
                 p.sendMessage("§cKeine gespeicherte Position für dich gefunden. Du wirst zum Spawn teleportiert.");
                 p.teleport(world.getSpawnLocation());
+
+                Bukkit.getScheduler().runTask(plugin, () -> plugin.getInventoryManager().loadInventory(p));
             }
         }
 
         plugin.getTimerManager().startTimer();
     }
-
 
 
     private void pauseChallenge() {
@@ -163,7 +178,6 @@ public class ChallengeCommand implements CommandExecutor {
 
         plugin.saveConfig();
     }
-
 
 
     private void endChallenge(Player player) {
@@ -196,7 +210,6 @@ public class ChallengeCommand implements CommandExecutor {
 
         player.sendMessage("§cChallenge beendet und alle Welten gelöscht.");
     }
-
 
 
     private void cleanupChallenges(Player player) {

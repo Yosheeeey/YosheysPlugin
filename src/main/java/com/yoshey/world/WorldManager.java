@@ -1,10 +1,14 @@
 package com.yoshey.world;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.util.UUID;
 
 public class WorldManager {
 
@@ -57,7 +61,6 @@ public class WorldManager {
 
         return world;
     }
-
 
 
     public void deleteWorld(World world) {
